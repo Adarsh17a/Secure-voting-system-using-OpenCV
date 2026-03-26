@@ -1,0 +1,5 @@
+opencv-python
+scikit-learn
+pywin32
+customtkinter
+pillow
