@@ -1,5 +1,7 @@
-opencv-python
+fastapi
+uvicorn
+opencv-python-headless
+numpy
+python-multipart
 scikit-learn
-pywin32; sys_platform == "win32"
-customtkinter
 pillow
