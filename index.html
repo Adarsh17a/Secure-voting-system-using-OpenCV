@@ -1,1 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Smart Voting</title>
 
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #0b0f1a, #111827);
+  color: white;
+  text-align: center;
+}
+
+/* container */
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+/* title */
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+/* card */
+.card {
+  background: #111827;
+  border-radius: 20px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+
+/* video */
+video {
+  border-radius: 15px;
+  margin-top: 10px;
+}
+
+/* buttons */
+.btn {
+  margin: 10px;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 30px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* primary */
+.primary {
+  background: #7c3aed;
+  color: white;
+}
+.primary:hover {
+  background: #a78bfa;
+}
+
+/* party buttons */
+.party {
+  font-weight: bold;
+}
+
+.bjp { background:#ff9933; }
+.congress { background:#22c55e; }
+.aap { background:#2563eb; }
+.nota { background:#ec4899; }
+
+/* status */
+.status {
+  margin-top: 15px;
+  font-size: 18px;
+  color: #10b981;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🚀 Smart Voting System</h1>
+
+<div class="card">
+  <h3>Step 1: Face Recognition</h3>
+
+  <video id="video" width="400" autoplay></video>
+  <br>
+
+  <button class="btn primary" onclick="capture()">Recognize Me</button>
+
+  <div id="result" class="status"></div>
+</div>
+
+<div class="card" id="voteSection" style="display:none;">
+  <h3>Step 2: Cast Your Vote</h3>
+
+  <button class="btn party bjp" onclick="vote('BJP')">BJP</button>
+  <button class="btn party congress" onclick="vote('CONGRESS')">CONGRESS</button>
+  <button class="btn party aap" onclick="vote('AAP')">AAP</button>
+  <button class="btn party nota" onclick="vote('NOTA')">NOTA</button>
+</div>
+
+</div>
+
+<script>
+const BACKEND = "https://secure-voting-system-using-opencv.onrender.com"; // 🔥 change this
+
+const video = document.getElementById("video")
+
+navigator.mediaDevices.getUserMedia({ video: true })
+.then(stream => video.srcObject = stream)
+
+function capture() {
+    let canvas = document.createElement("canvas")
+    canvas.width = 400
+    canvas.height = 300
+    canvas.getContext("2d").drawImage(video, 0, 0)
+
+    canvas.toBlob(async (blob) => {
+        let formData = new FormData()
+        formData.append("file", blob)
+
+        let res = await fetch(`${BACKEND}/recognize`, {
+            method: "POST",
+            body: formData
+        })
+
+        let data = await res.json()
+
+        document.getElementById("result").innerText = "User: " + data.name
+        document.getElementById("voteSection").style.display = "block"
+    })
+}
+
+async function vote(party) {
+    let name = document.getElementById("result").innerText.replace("User: ", "")
+
+    let res = await fetch(`${BACKEND}/vote?name=${name}&party=${party}`, {
+        method: "POST"
+    })
+
+    let data = await res.json()
+    alert("✅ " + data.message)
+}
+</script>
+
+</body>
+</html>
